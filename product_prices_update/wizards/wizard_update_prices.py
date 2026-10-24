@@ -10,7 +10,7 @@ class ProductPricesUpdateWizard(models.TransientModel):
     _name = "product.prices_update_wizard"
     _description = "product.prices_update_wizard"
 
-    price_type = fields.Selection([("list_price", "Sale Price"), ("standard_price", "Cost Price")], required=True)
+    price_type = fields.Selection([("list_price", "Sale Price"), ("standard_price", "Cost Price"), ("replenishment_base_cost", "Costo Reposicion")], required=True)
     price_discount = fields.Float()
     price_surcharge = fields.Float(
         help="Specify the fixed amount to add"
@@ -52,6 +52,8 @@ class ProductPricesUpdateWizard(models.TransientModel):
                     old_price = prodct.list_price
                 elif self.price_type == "standard_price":
                     old_price = prodct.standard_price
+                elif self.price_type == "replenishment_base_cost":
+                    old_price = prodct.replenishment_base_cost
                 else:
                     raise UserError(_('Price type "%s" is not ' "implemented") % (self.price_type))
                 new_price = self.calc_new_price(old_price, self.price_discount, self.price_surcharge, self.price_round)
@@ -123,6 +125,8 @@ class ProductPricesUpdateWizardResult(models.TransientModel):
                 old_price = product_tmpl.list_price
             elif price_type == "standard_price":
                 old_price = product_tmpl.standard_price
+            elif price_type == "replenishment_base_cost":
+                old_price = product_tmpl.replenishment_base_cost
             else:
                 raise UserError(_('Price type "%s" is not implemented') % (price_type))
             vals = {
